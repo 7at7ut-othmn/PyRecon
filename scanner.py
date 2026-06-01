@@ -1,9 +1,12 @@
 import socket
+import time
 
 target = input("Enter target IP: ")
 
 start_port = int(input("Start port: "))
 end_port = int(input("End port: "))
+
+start_time = time.time()
 
 print(f"\n[+] Scanning {target}\n")
 
@@ -25,4 +28,6 @@ for port in range(start_port, end_port + 1):
 
     s.close()
 
-print("\nScan completed.")
+end_time = time.time()
+
+print(f"\nScan completed in {round(end_time - start_time, 2)} seconds.")
