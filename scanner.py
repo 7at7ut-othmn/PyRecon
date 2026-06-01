@@ -2,6 +2,7 @@ import socket
 import time
 import json
 from colorama import Fore, init
+from concurrent.futures import ThreadPoolExecutor
 
 init()
 
@@ -33,7 +34,7 @@ def grab_banner(ip, port):
         return "No banner"
 
 
-for port in range(start_port, end_port + 1):
+def scan_port(port):
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.settimeout(1)
@@ -59,6 +60,10 @@ for port in range(start_port, end_port + 1):
         })
 
     s.close()
+
+
+with ThreadPoolExecutor(max_workers=50) as executor:
+    executor.map(scan_port, range(start_port, end_port + 1))
 
 with open("scan_results.json", "w") as file:
     json.dump(results, file, indent=4)
