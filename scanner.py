@@ -1,6 +1,9 @@
 import socket
 import time
 import json
+from colorama import Fore, init
+
+init()
 
 target = input("Enter target IP: ")
 
@@ -11,7 +14,7 @@ results = []
 
 start_time = time.time()
 
-print(f"\n[+] Scanning {target}\n")
+print(Fore.CYAN + f"\n[+] Scanning {target}\n")
 
 
 def grab_banner(ip, port):
@@ -46,15 +49,14 @@ for port in range(start_port, end_port + 1):
 
         banner = grab_banner(target, port)
 
-        output = {
+        print(Fore.GREEN + f"[OPEN] Port {port} -> {service}")
+        print(Fore.YELLOW + f"Banner: {banner}\n")
+
+        results.append({
             "port": port,
             "service": service,
             "banner": banner
-        }
-
-        print(output)
-
-        results.append(output)
+        })
 
     s.close()
 
@@ -63,4 +65,4 @@ with open("scan_results.json", "w") as file:
 
 end_time = time.time()
 
-print(f"\nScan completed in {round(end_time - start_time, 2)} seconds.")
+print(Fore.CYAN + f"\nScan completed in {round(end_time - start_time, 2)} seconds.")
