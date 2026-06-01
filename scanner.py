@@ -6,6 +6,8 @@ target = input("Enter target IP: ")
 start_port = int(input("Start port: "))
 end_port = int(input("End port: "))
 
+results = []
+
 start_time = time.time()
 
 print(f"\n[+] Scanning {target}\n")
@@ -43,10 +45,18 @@ for port in range(start_port, end_port + 1):
 
         banner = grab_banner(target, port)
 
-        print(f"[OPEN] Port {port} -> {service}")
-        print(f"Banner: {banner}\n")
+        output = f"Port {port} -> {service} | Banner: {banner}"
+
+        print(output)
+
+        results.append(output)
 
     s.close()
+
+with open("scan_results.txt", "w") as file:
+
+    for result in results:
+        file.write(result + "\n")
 
 end_time = time.time()
 
