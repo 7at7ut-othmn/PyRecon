@@ -14,7 +14,13 @@ for port in ports:
     result = s.connect_ex((target, port))
 
     if result == 0:
-        print(f"[OPEN] Port {port}")
+
+        try:
+            service = socket.getservbyport(port)
+        except:
+            service = "Unknown"
+
+        print(f"[OPEN] Port {port} -> {service}")
 
     s.close()
 
