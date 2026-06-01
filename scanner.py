@@ -1,5 +1,6 @@
 import socket
 import time
+import json
 
 target = input("Enter target IP: ")
 
@@ -45,7 +46,11 @@ for port in range(start_port, end_port + 1):
 
         banner = grab_banner(target, port)
 
-        output = f"Port {port} -> {service} | Banner: {banner}"
+        output = {
+            "port": port,
+            "service": service,
+            "banner": banner
+        }
 
         print(output)
 
@@ -53,10 +58,8 @@ for port in range(start_port, end_port + 1):
 
     s.close()
 
-with open("scan_results.txt", "w") as file:
-
-    for result in results:
-        file.write(result + "\n")
+with open("scan_results.json", "w") as file:
+    json.dump(results, file, indent=4)
 
 end_time = time.time()
 
