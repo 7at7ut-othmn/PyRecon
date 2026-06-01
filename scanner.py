@@ -10,6 +10,23 @@ start_time = time.time()
 
 print(f"\n[+] Scanning {target}\n")
 
+
+def grab_banner(ip, port):
+
+    try:
+        s = socket.socket()
+        s.settimeout(2)
+
+        s.connect((ip, port))
+
+        banner = s.recv(1024).decode().strip()
+
+        return banner
+
+    except:
+        return "No banner"
+
+
 for port in range(start_port, end_port + 1):
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -24,7 +41,10 @@ for port in range(start_port, end_port + 1):
         except:
             service = "Unknown"
 
+        banner = grab_banner(target, port)
+
         print(f"[OPEN] Port {port} -> {service}")
+        print(f"Banner: {banner}\n")
 
     s.close()
 
