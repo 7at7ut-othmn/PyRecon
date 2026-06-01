@@ -2,11 +2,12 @@ import socket
 
 target = input("Enter target IP: ")
 
-ports = [21, 22, 80, 443, 3306]
+start_port = int(input("Start port: "))
+end_port = int(input("End port: "))
 
 print(f"\n[+] Scanning {target}\n")
 
-for port in ports:
+for port in range(start_port, end_port + 1):
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.settimeout(1)
