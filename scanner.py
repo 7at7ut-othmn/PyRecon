@@ -6,7 +6,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 init()
 
-target = input("Enter target IP: ")
+targets = input("Enter target IPs separated by commas: ").split(",")
 
 start_port = int(input("Start port: "))
 end_port = int(input("End port: "))
@@ -15,7 +15,7 @@ results = []
 
 start_time = time.time()
 
-print(Fore.CYAN + f"\n[+] Scanning {target}\n")
+print(Fore.CYAN + "\n[+] Starting network scan...\n")
 
 
 def grab_banner(ip, port):
@@ -34,7 +34,7 @@ def grab_banner(ip, port):
         return "No banner"
 
 
-def scan_port(port):
+def scan_port(target, port):
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.settimeout(1)
@@ -50,10 +50,11 @@ def scan_port(port):
 
         banner = grab_banner(target, port)
 
-        print(Fore.GREEN + f"[OPEN] Port {port} -> {service}")
+        print(Fore.GREEN + f"[OPEN] {target}:{port} -> {service}")
         print(Fore.YELLOW + f"Banner: {banner}\n")
 
         results.append({
+            "target": target,
             "port": port,
             "service": service,
             "banner": banner
@@ -62,8 +63,17 @@ def scan_port(port):
     s.close()
 
 
-with ThreadPoolExecutor(max_workers=50) as executor:
-    executor.map(scan_port, range(start_port, end_port + 1))
+for target in targets:
+
+    target = target.strip()
+
+    print(Fore.CYAN + f"\n[+] Scanning target: {target}\n")
+
+    with ThreadPoolExecutor(max_workers=50) as executor:
+
+        for port in range(start_port, end_port + 1):
+            executor.submit(scan_port, target, port)
+
 
 with open("scan_results.json", "w") as file:
     json.dump(results, file, indent=4)
