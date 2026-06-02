@@ -2,15 +2,17 @@ import socket
 import time
 import json
 import argparse
+import platform
+import subprocess
+
 from colorama import Fore, init
 from concurrent.futures import ThreadPoolExecutor
 
 init()
 
 
-
 parser = argparse.ArgumentParser(
-    description="PyRecon - Multi-threaded Network Scanner"
+    description="PyRecon - Advanced Network Scanner"
 )
 
 parser.add_argument(
@@ -44,6 +46,44 @@ start_time = time.time()
 
 print(Fore.CYAN + "\n[+] Starting PyRecon Scan...\n")
 
+def detect_os(target):
+
+    try:
+
+        if platform.system().lower() == "windows":
+
+            command = f"ping -n 1 {target}"
+
+        else:
+
+            command = f"ping -c 1 {target}"
+
+        output = subprocess.check_output(
+            command,
+            shell=True
+        ).decode(errors="ignore")
+
+        output = output.lower()
+
+        if "ttl=128" in output:
+
+            return "Windows"
+
+        elif "ttl=64" in output:
+
+            return "Linux/Unix"
+
+        elif "ttl=255" in output:
+
+            return "Cisco/Network Device"
+
+        else:
+
+            return "Unknown"
+
+    except:
+
+        return "Unknown"
 
 
 def grab_banner(ip, port):
@@ -51,6 +91,7 @@ def grab_banner(ip, port):
     try:
 
         s = socket.socket()
+
         s.settimeout(2)
 
         s.connect((ip, port))
@@ -62,6 +103,7 @@ def grab_banner(ip, port):
     except:
 
         return "No banner"
+
 
 
 
@@ -106,13 +148,18 @@ for target in targets:
 
     target = target.strip()
 
-    print(Fore.CYAN + f"\n[+] Scanning Target: {target}\n")
+    print(Fore.CYAN + f"\n[+] Scanning Target: {target}")
+
+    detected_os = detect_os(target)
+
+    print(Fore.MAGENTA + f"[+] Detected OS: {detected_os}\n")
 
     with ThreadPoolExecutor(max_workers=50) as executor:
 
         for port in range(start_port, end_port + 1):
 
             executor.submit(scan_port, target, port)
+
 
 
 with open("scan_results.json", "w") as file:
